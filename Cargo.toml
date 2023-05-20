@@ -7,6 +7,7 @@ edition = "2021"
 
 [lib]
 path = "src/lib.rs"
+name = "newsletter"
 
 [[bin]]
 path = "src/main.rs"
@@ -15,7 +16,9 @@ name = "newsletter"
 [dependencies]
 axum = "0.6.18"
 hyper = { version = "0.14.26", features = ["full"] }
+serde = { version = "1.0.163", features = ["derive"] }
 tokio = { version = "1.28.1", features = ["full"] }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
+mime = "0.3.17"
