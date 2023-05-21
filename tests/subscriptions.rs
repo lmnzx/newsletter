@@ -1,18 +1,31 @@
 // test
 #[cfg(test)]
 mod tests {
-    use newsletter::app;
+    use std::time::Duration;
+
+    use newsletter::{configuration::get_config, startup::app};
 
     use axum::{
         body::Body,
         http::{self, Request, StatusCode},
     };
+    use sqlx::postgres::PgPoolOptions;
     use tower::ServiceExt;
 
     #[tokio::test]
     async fn subscriptions_valid_data_test() {
         let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
-        let app = app();
+
+        let config = get_config().expect("Failed to read configuration.");
+
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .acquire_timeout(Duration::from_secs(5))
+            .connect(&config.database.connection_string())
+            .await
+            .expect("Failed to connect to Postgres.");
+
+        let app = app(pool);
 
         let response = app
             .oneshot(
@@ -41,7 +54,16 @@ mod tests {
         ];
 
         for (invaild_body, error_message) in test_cases {
-            let app = app();
+            let config = get_config().expect("Failed to read configuration.");
+
+            let pool = PgPoolOptions::new()
+                .max_connections(5)
+                .acquire_timeout(Duration::from_secs(5))
+                .connect(&config.database.connection_string())
+                .await
+                .expect("Failed to connect to Postgres.");
+
+            let app = app(pool);
 
             let response = app
                 .oneshot(
