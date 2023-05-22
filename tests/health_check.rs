@@ -1,17 +1,29 @@
 // test
 #[cfg(test)]
 mod tests {
-    use newsletter::app;
+    use std::time::Duration;
+
+    use newsletter::{configuration::get_config, startup::app};
 
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
+    use sqlx::postgres::PgPoolOptions;
     use tower::ServiceExt;
 
     #[tokio::test]
     async fn health_check_test() {
-        let app = app();
+        let config = get_config().expect("Failed to read configuration.");
+
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .acquire_timeout(Duration::from_secs(5))
+            .connect(&config.database.connection_string())
+            .await
+            .expect("Failed to connect to Postgres.");
+
+        let app = app(pool);
 
         let response = app
             .oneshot(

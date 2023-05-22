@@ -7,6 +7,7 @@ edition = "2021"
 
 [lib]
 path = "src/lib.rs"
+name = "newsletter"
 
 [[bin]]
 path = "src/main.rs"
@@ -14,8 +15,25 @@ name = "newsletter"
 
 [dependencies]
 axum = "0.6.18"
+chrono = { version = "0.4.24", features = ["clock"] }
+config = "0.13.3"
 hyper = { version = "0.14.26", features = ["full"] }
+serde = { version = "1.0.163", features = ["derive"] }
 tokio = { version = "1.28.1", features = ["full"] }
+uuid = { version = "1.3.3", features = ["v4"] }
+
+[dependencies.sqlx]
+version = "0.6.3"
+deafult-features = false
+features = [
+  "postgres",
+  "macros",
+  "runtime-tokio-rustls",
+  "uuid",
+  "chrono",
+  "migrate"
+]
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
+mime = "0.3.17"
