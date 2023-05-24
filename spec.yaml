@@ -10,8 +10,14 @@ services:
       repo: lmnzx/newsletter
     health_check:
        http_path: /health_check
-    http_port: 8000
+    http_port: 3000
     instance_count: 1
     instance_size_slug: basic-xxs
     routes:
     - path: /
+databases:
+  - engine: PG
+    name: newsletter-db
+    num_nodes: 1
+    size: db-s-dev-database
+    version: "15"
