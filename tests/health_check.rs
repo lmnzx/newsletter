@@ -19,7 +19,7 @@ mod tests {
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .acquire_timeout(Duration::from_secs(5))
-            .connect(&config.database.connection_string())
+            .connect_with(config.database.without_db())
             .await
             .expect("failed to connect to Postgres.");
 

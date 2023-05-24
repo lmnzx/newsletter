@@ -16,7 +16,7 @@ mod tests {
 
     pub async fn db_config(config: &DatabaseSettings) -> PgPool {
         // Create database
-        let mut connection = PgConnection::connect(&config.connection_string_without_db())
+        let mut connection = PgConnection::connect_with(&config.without_db())
             .await
             .expect("failed to connect to Postgres");
 
@@ -26,7 +26,7 @@ mod tests {
             .expect("failed to create database.");
 
         // Migrate database
-        let pool = PgPool::connect(&config.connection_string())
+        let pool = PgPool::connect_with(config.with_db())
             .await
             .expect("failed to connect to Postgres.");
 
