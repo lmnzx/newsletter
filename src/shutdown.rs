@@ -4,13 +4,13 @@ pub async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
-            .expect("Failed to install CTRL+C signal handler");
+            .expect("failed to install CTRL+C signal handler");
     };
 
     #[cfg(unix)]
     let terminate = async {
         signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("Failed to install termination signal handler")
+            .expect("failed to install termination signal handler")
             .recv()
             .await;
     };
@@ -18,7 +18,7 @@ pub async fn shutdown_signal() {
     #[cfg(windows)]
     let terminate = async {
         signal::windows::ctrl_break()
-            .expect("Failed to install termination signal handler")
+            .expect("failed to install termination signal handler")
             .recv()
             .await;
     };
