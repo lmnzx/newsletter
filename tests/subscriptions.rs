@@ -18,22 +18,22 @@ mod tests {
         // Create database
         let mut connection = PgConnection::connect(&config.connection_string_without_db())
             .await
-            .expect("Failed to connect to Postgres");
+            .expect("failed to connect to Postgres");
 
         connection
             .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
             .await
-            .expect("Failed to create database.");
+            .expect("failed to create database.");
 
         // Migrate database
         let pool = PgPool::connect(&config.connection_string())
             .await
-            .expect("Failed to connect to Postgres.");
+            .expect("failed to connect to Postgres.");
 
         sqlx::migrate!("./migrations")
             .run(&pool)
             .await
-            .expect("Failed to migrate the database");
+            .expect("failed to migrate the database");
 
         pool
     }
@@ -42,7 +42,7 @@ mod tests {
     async fn subscriptions_valid_data_test() {
         let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
-        let mut config = get_config().expect("Failed to read configuration.");
+        let mut config = get_config().expect("failed to read configuration.");
 
         config.database.database_name = Uuid::new_v4().to_string();
 
@@ -77,7 +77,7 @@ mod tests {
         ];
 
         for (invaild_body, error_message) in test_cases {
-            let mut config = get_config().expect("Failed to read configuration.");
+            let mut config = get_config().expect("failed to read configuration.");
 
             config.database.database_name = Uuid::new_v4().to_string();
 

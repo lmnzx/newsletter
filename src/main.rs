@@ -15,20 +15,19 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let config = get_config().expect("Failed to read configuration.");
+    let config = get_config().expect("failed to read configuration.");
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(5))
-        .connect(&config.database.connection_string())
-        .await
+        .connect_lazy(&config.database.connection_string())
         .expect("Failed to connect to Postgres.");
 
     let app = app(pool);
 
-    let addr: SocketAddr = format!("127.0.0.1:{}", config.application_port)
+    let addr: SocketAddr = format!("{}:{}", config.application.host, config.application.port)
         .parse()
-        .expect("Failed to parse address.");
+        .expect("failed to parse address.");
 
     tracing::debug!("listening on {}", addr);
 

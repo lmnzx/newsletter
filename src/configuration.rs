@@ -1,7 +1,9 @@
+use config::{Config, ConfigError, File};
+
 #[derive(serde::Deserialize, Clone)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application_port: u16,
+    pub application: ApplicationSettings,
 }
 
 #[derive(serde::Deserialize, Clone)]
@@ -11,6 +13,41 @@ pub struct DatabaseSettings {
     pub port: u16,
     pub host: String,
     pub database_name: String,
+}
+
+#[derive(serde::Deserialize, Clone)]
+pub struct ApplicationSettings {
+    pub port: u16,
+    pub host: String,
+}
+
+pub enum Environment {
+    Local,
+    Production,
+}
+
+impl Environment {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Environment::Local => "local",
+            Environment::Production => "production",
+        }
+    }
+}
+
+impl TryFrom<String> for Environment {
+    type Error = String;
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        match s.to_lowercase().as_str() {
+            "local" => Ok(Self::Local),
+            "production" => Ok(Self::Production),
+            other => Err(format!(
+                "{} is not a supported environment. \
+                Use either `local` or `production`.",
+                other
+            )),
+        }
+    }
 }
 
 impl DatabaseSettings {
@@ -29,9 +66,21 @@ impl DatabaseSettings {
     }
 }
 
-pub fn get_config() -> Result<Settings, config::ConfigError> {
-    let settings = config::Config::builder()
-        .add_source(config::File::new("config.yaml", config::FileFormat::Yaml))
+pub fn get_config() -> Result<Settings, ConfigError> {
+    let base_path = std::env::current_dir().expect("failed to detemine the current directory");
+
+    let config_dir = base_path.join("config");
+
+    let env: Environment = std::env::var("APP_ENVIRONMENT")
+        .unwrap_or_else(|_| "local".into())
+        .try_into()
+        .expect("failed to parse APP_ENVIRONMENT");
+
+    let env_file = format!("{}.yaml", env.as_str());
+
+    let settings = Config::builder()
+        .add_source(File::from(config_dir.join("base.yaml")))
+        .add_source(File::from(config_dir.join(env_file)))
         .build()?;
 
     settings.try_deserialize::<Settings>()

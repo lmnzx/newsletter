@@ -14,14 +14,14 @@ mod tests {
 
     #[tokio::test]
     async fn health_check_test() {
-        let config = get_config().expect("Failed to read configuration.");
+        let config = get_config().expect("failed to read configuration.");
 
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .acquire_timeout(Duration::from_secs(5))
             .connect(&config.database.connection_string())
             .await
-            .expect("Failed to connect to Postgres.");
+            .expect("failed to connect to Postgres.");
 
         let app = app(pool);
 
