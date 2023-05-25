@@ -22,12 +22,6 @@ async fn main() {
         .acquire_timeout(Duration::from_secs(5))
         .connect_lazy_with(config.database.with_db());
 
-    // run migrations after connecting to the database
-    sqlx::migrate!("./migrations")
-        .run(&pool)
-        .await
-        .expect("failed to migrate the database");
-
     let app = app(pool);
 
     let addr: SocketAddr = format!("{}:{}", config.application.host, config.application.port)
