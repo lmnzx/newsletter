@@ -44,7 +44,7 @@ mod tests {
 
         let mut config = get_config().expect("failed to read configuration.");
 
-        config.database.database_name = Uuid::new_v4().to_string();
+        config.database.database_name = format!("test-{}", Uuid::new_v4().to_string());
 
         let pool = db_config(&config.database).await;
 
@@ -69,6 +69,47 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn subscribe_returns_a_400_when_fields_are_present_but_invalid() {
+        let test_cases = vec![
+            ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+            ("name=Ursula&email=", "empty email"),
+            ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+        ];
+
+        for (body, description) in test_cases {
+            let mut config = get_config().expect("failed to read configuration.");
+
+            config.database.database_name = format!("test-{}", Uuid::new_v4().to_string());
+
+            let pool = db_config(&config.database).await;
+
+            let app = app(pool);
+
+            let response = app
+                .oneshot(
+                    Request::builder()
+                        .method(http::Method::POST)
+                        .uri("/subscriptions")
+                        .header(
+                            http::header::CONTENT_TYPE,
+                            mime::APPLICATION_WWW_FORM_URLENCODED.to_string(),
+                        )
+                        .body(Body::from(body))
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+
+            assert_eq!(
+                response.status(),
+                StatusCode::BAD_REQUEST,
+                "{}",
+                description
+            );
+        }
+    }
+
+    #[tokio::test]
     async fn subscriptions_invalid_data_test() {
         let test_cases = vec![
             ("name=le%20mon", "missing the name"),
@@ -79,7 +120,7 @@ mod tests {
         for (invaild_body, error_message) in test_cases {
             let mut config = get_config().expect("failed to read configuration.");
 
-            config.database.database_name = Uuid::new_v4().to_string();
+            config.database.database_name = format!("test-{}", Uuid::new_v4().to_string());
 
             let pool = db_config(&config.database).await;
 
@@ -109,3 +150,12 @@ mod tests {
         }
     }
 }
+
+/*
+--to delete all test databases--
+SELECT 'DROP DATABASE ' || quote_ident(datname) || ';'
+FROM pg_database
+WHERE datname LIKE 'test%' AND datistemplate=false
+
+\gexec
+*/
