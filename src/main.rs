@@ -1,4 +1,4 @@
-use newsletter::{configuration::get_config, shutdown, startup::app};
+use newsletter::{configuration::get_config, email_client::EmailClient, shutdown, startup::app};
 use sqlx::postgres::PgPoolOptions;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
@@ -22,7 +22,19 @@ async fn main() {
         .acquire_timeout(Duration::from_secs(5))
         .connect_lazy_with(config.database.with_db());
 
-    let app = app(pool);
+    let sender_email = config
+        .email_client
+        .sender()
+        .expect("Invalid sender email address.");
+
+    let email_client = EmailClient::new(
+        config.email_client.base_url,
+        sender_email,
+        config.email_client.authorization_token,
+        std::time::Duration::from_millis(200),
+    );
+
+    let app = app(pool, email_client);
 
     let addr: SocketAddr = format!("{}:{}", config.application.host, config.application.port)
         .parse()

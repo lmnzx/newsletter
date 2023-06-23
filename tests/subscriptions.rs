@@ -3,6 +3,7 @@
 mod tests {
     use newsletter::{
         configuration::{get_config, DatabaseSettings},
+        email_client::EmailClient,
         startup::app,
     };
 
@@ -48,7 +49,19 @@ mod tests {
 
         let pool = db_config(&config.database).await;
 
-        let app = app(pool);
+        let sender_email = config
+            .email_client
+            .sender()
+            .expect("Invalid sender email address.");
+
+        let email_client = EmailClient::new(
+            config.email_client.base_url,
+            sender_email,
+            config.email_client.authorization_token,
+            std::time::Duration::from_millis(200),
+        );
+
+        let app = app(pool, email_client);
 
         let response = app
             .oneshot(
@@ -83,7 +96,19 @@ mod tests {
 
             let pool = db_config(&config.database).await;
 
-            let app = app(pool);
+            let sender_email = config
+                .email_client
+                .sender()
+                .expect("Invalid sender email address.");
+
+            let email_client = EmailClient::new(
+                config.email_client.base_url,
+                sender_email,
+                config.email_client.authorization_token,
+                std::time::Duration::from_millis(200),
+            );
+
+            let app = app(pool, email_client);
 
             let response = app
                 .oneshot(
@@ -124,7 +149,19 @@ mod tests {
 
             let pool = db_config(&config.database).await;
 
-            let app = app(pool);
+            let sender_email = config
+                .email_client
+                .sender()
+                .expect("Invalid sender email address.");
+
+            let email_client = EmailClient::new(
+                config.email_client.base_url,
+                sender_email,
+                config.email_client.authorization_token,
+                std::time::Duration::from_millis(200),
+            );
+
+            let app = app(pool, email_client);
 
             let response = app
                 .oneshot(

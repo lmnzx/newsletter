@@ -13,7 +13,10 @@ use tower_http::{
 use tracing::Level;
 use uuid::Uuid;
 
-use crate::routes::{health_check, subscribe};
+use crate::{
+    email_client::EmailClient,
+    routes::{health_check, subscribe},
+};
 
 #[derive(Clone)]
 struct MakeRequestUuid;
@@ -26,7 +29,8 @@ impl MakeRequestId for MakeRequestUuid {
     }
 }
 
-pub fn app(pool: PgPool) -> Router {
+pub fn app(pool: PgPool, email_client: EmailClient) -> Router {
+    // let email_client = Arc::new(email_client);
     Router::new()
         .route("/health_check", get(health_check))
         .route("/subscriptions", post(subscribe))
@@ -49,4 +53,5 @@ pub fn app(pool: PgPool) -> Router {
                 .propagate_x_request_id(),
         )
         .with_state(pool)
+        .with_state(email_client.clone())
 }
