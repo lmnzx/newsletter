@@ -3,7 +3,7 @@
 mod tests {
     use std::time::Duration;
 
-    use newsletter::{configuration::get_config, startup::app};
+    use newsletter::{configuration::get_config, email_client::EmailClient, startup::app};
 
     use axum::{
         body::Body,
@@ -16,6 +16,18 @@ mod tests {
     async fn health_check_test() {
         let config = get_config().expect("failed to read configuration.");
 
+        let sender_email = config
+            .email_client
+            .sender()
+            .expect("Invalid sender email address.");
+
+        let email_client = EmailClient::new(
+            config.email_client.base_url,
+            sender_email,
+            config.email_client.authorization_token,
+            std::time::Duration::from_millis(200),
+        );
+
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .acquire_timeout(Duration::from_secs(5))
@@ -23,7 +35,7 @@ mod tests {
             .await
             .expect("failed to connect to Postgres.");
 
-        let app = app(pool);
+        let app = app(pool, email_client);
 
         let response = app
             .oneshot(
