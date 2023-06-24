@@ -14,7 +14,7 @@ path = "src/main.rs"
 name = "newsletter"
 
 [dependencies]
-axum = {version = "0.6.18", features = ["tracing"]}
+axum = {version = "0.6.18", features = ["tracing", "query"]}
 chrono = { version = "0.4.24", features = ["clock"] }
 config = "0.13.3"
 hyper = { version = "0.14.26", features = ["full"] }

@@ -66,9 +66,14 @@ pub async fn subscribe(
     {
         return StatusCode::INTERNAL_SERVER_ERROR;
     }
-    if send_confirmation_email(&email_client, &new_subscriber, &base_url, "mytoken")
-        .await
-        .is_err()
+    if send_confirmation_email(
+        &email_client,
+        &new_subscriber,
+        &base_url,
+        &subscription_token,
+    )
+    .await
+    .is_err()
     {
         tracing::error!("failed to send welcome email");
         return StatusCode::INTERNAL_SERVER_ERROR;
