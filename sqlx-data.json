@@ -1,6 +1,19 @@
 {
   "db": "PostgreSQL",
-  "9846ab6af9e6badf18dad96e02371382f562618db9ce65ee8f206e9c90b2af0d": {
+  "a8dc38096c88e24939aaa90038f89b1efe8155599f584b0dc26c146eb5f2bb3d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n    INSERT INTO subscription_tokens (subscription_token, subscriber_id) VALUES ($1, $2)\n    "
+  },
+  "c5c731d0101a967e46d784f2259dcfa1954644416e7a608f33559a342cc1a411": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -13,6 +26,6 @@
         ]
       }
     },
-    "query": "\n    INSERT INTO subscriptions (id, email, name, subscribed_at, status) VALUES ($1, $2, $3, $4, 'confirmed')\n    "
+    "query": "\n    INSERT INTO subscriptions (id, email, name, subscribed_at, status) VALUES ($1, $2, $3, $4, 'pending_confirmation')\n    "
   }
 }
