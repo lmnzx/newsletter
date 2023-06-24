@@ -21,6 +21,8 @@ mod tests {
             .sender()
             .expect("Invalid sender email address.");
 
+        let base_url = config.application.base_url.clone();
+
         let email_client = EmailClient::new(
             config.email_client.base_url,
             sender_email,
@@ -35,7 +37,7 @@ mod tests {
             .await
             .expect("failed to connect to Postgres.");
 
-        let app = app(pool, email_client);
+        let app = app(pool, email_client, base_url);
 
         let response = app
             .oneshot(
