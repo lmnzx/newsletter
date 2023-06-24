@@ -1,7 +1,7 @@
 use axum::{
     http::Request,
     routing::{get, post},
-    Router,
+    Extension, Router,
 };
 use sqlx::PgPool;
 use tower::ServiceBuilder;
@@ -52,6 +52,6 @@ pub fn app(pool: PgPool, email_client: EmailClient) -> Router {
                 )
                 .propagate_x_request_id(),
         )
+        .layer(Extension(email_client))
         .with_state(pool)
-        .with_state(email_client.clone())
 }
