@@ -15,7 +15,7 @@ use uuid::Uuid;
 
 use crate::{
     email_client::EmailClient,
-    routes::{health_check, subscribe},
+    routes::{confirm, health_check, subscribe},
 };
 
 #[derive(Clone)]
@@ -29,11 +29,11 @@ impl MakeRequestId for MakeRequestUuid {
     }
 }
 
-pub fn app(pool: PgPool, email_client: EmailClient) -> Router {
-    // let email_client = Arc::new(email_client);
+pub fn app(pool: PgPool, email_client: EmailClient, base_url: String) -> Router {
     Router::new()
         .route("/health_check", get(health_check))
         .route("/subscriptions", post(subscribe))
+        .route("/subscriptions/confirm", get(confirm))
         .layer(
             ServiceBuilder::new()
                 .set_x_request_id(MakeRequestUuid)
@@ -53,5 +53,6 @@ pub fn app(pool: PgPool, email_client: EmailClient) -> Router {
                 .propagate_x_request_id(),
         )
         .layer(Extension(email_client))
+        .layer(Extension(base_url))
         .with_state(pool)
 }

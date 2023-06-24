@@ -17,6 +17,8 @@ async fn main() {
 
     let config = get_config().expect("failed to read configuration.");
 
+    let base_url = config.application.base_url.clone();
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(5))
@@ -35,7 +37,7 @@ async fn main() {
         timeout,
     );
 
-    let app = app(pool, email_client);
+    let app = app(pool, email_client, base_url);
 
     let addr: SocketAddr = format!("{}:{}", config.application.host, config.application.port)
         .parse()

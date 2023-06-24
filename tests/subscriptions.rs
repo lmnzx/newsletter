@@ -49,6 +49,8 @@ mod tests {
 
         let pool = db_config(&config.database).await;
 
+        let base_url = config.application.base_url.clone();
+
         let sender_email = config
             .email_client
             .sender()
@@ -61,7 +63,7 @@ mod tests {
             std::time::Duration::from_millis(200),
         );
 
-        let app = app(pool, email_client);
+        let app = app(pool, email_client, base_url);
 
         let response = app
             .oneshot(
@@ -96,6 +98,8 @@ mod tests {
 
             let pool = db_config(&config.database).await;
 
+            let base_url = config.application.base_url.clone();
+
             let sender_email = config
                 .email_client
                 .sender()
@@ -108,7 +112,7 @@ mod tests {
                 std::time::Duration::from_millis(200),
             );
 
-            let app = app(pool, email_client);
+            let app = app(pool, email_client, base_url);
 
             let response = app
                 .oneshot(
@@ -149,6 +153,8 @@ mod tests {
 
             let pool = db_config(&config.database).await;
 
+            let base_url = config.application.base_url.clone();
+
             let sender_email = config
                 .email_client
                 .sender()
@@ -161,7 +167,7 @@ mod tests {
                 std::time::Duration::from_millis(200),
             );
 
-            let app = app(pool, email_client);
+            let app = app(pool, email_client, base_url);
 
             let response = app
                 .oneshot(
