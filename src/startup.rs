@@ -15,7 +15,7 @@ use uuid::Uuid;
 
 use crate::{
     email_client::EmailClient,
-    routes::{confirm, health_check, subscribe},
+    routes::{confirm, health_check, publish_newsletter, subscribe},
 };
 
 #[derive(Clone)]
@@ -34,6 +34,7 @@ pub fn app(pool: PgPool, email_client: EmailClient, base_url: String) -> Router 
         .route("/health_check", get(health_check))
         .route("/subscriptions", post(subscribe))
         .route("/subscriptions/confirm", get(confirm))
+        .route("/newsletters", post(publish_newsletter))
         .layer(
             ServiceBuilder::new()
                 .set_x_request_id(MakeRequestUuid)
