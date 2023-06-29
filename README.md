@@ -1,1 +1,1 @@
-## A simple newsletter app using rust 🦀
+# A simple newsletter app using rust 🦀

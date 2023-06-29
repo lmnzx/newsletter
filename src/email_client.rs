@@ -1,24 +1,12 @@
+use crate::domain::SubscriberEmail;
 use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
 
-use crate::domain::SubscriberEmail;
-
-#[derive(Clone)]
 pub struct EmailClient {
     http_client: Client,
     base_url: String,
     sender: SubscriberEmail,
     authorization_token: Secret<String>,
-}
-
-#[derive(serde::Serialize)]
-#[serde(rename_all = "PascalCase")]
-struct SendEmailRequest<'a> {
-    from: &'a str,
-    to: &'a str,
-    subject: &'a str,
-    html_body: &'a str,
-    text_body: &'a str,
 }
 
 impl EmailClient {
@@ -28,10 +16,7 @@ impl EmailClient {
         authorization_token: Secret<String>,
         timeout: std::time::Duration,
     ) -> Self {
-        let http_client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .expect("Failed to build reqwest client.");
+        let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
             http_client,
             base_url,
@@ -42,7 +27,7 @@ impl EmailClient {
 
     pub async fn send_email(
         &self,
-        recipient: SubscriberEmail,
+        recipient: &SubscriberEmail,
         subject: &str,
         html_content: &str,
         text_content: &str,
@@ -55,7 +40,6 @@ impl EmailClient {
             html_body: html_content,
             text_body: text_content,
         };
-
         self.http_client
             .post(&url)
             .header(
@@ -66,9 +50,18 @@ impl EmailClient {
             .send()
             .await?
             .error_for_status()?;
-
         Ok(())
     }
+}
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "PascalCase")]
+struct SendEmailRequest<'a> {
+    from: &'a str,
+    to: &'a str,
+    subject: &'a str,
+    html_body: &'a str,
+    text_body: &'a str,
 }
 
 #[cfg(test)]
@@ -143,7 +136,7 @@ mod tests {
 
         // Act
         let _ = email_client
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         // Assert
@@ -163,7 +156,7 @@ mod tests {
 
         // Act
         let outcome = email_client
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         // Assert
@@ -185,7 +178,7 @@ mod tests {
 
         // Act
         let outcome = email_client
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         // Assert
@@ -207,7 +200,7 @@ mod tests {
 
         // Act
         let outcome = email_client
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         // Assert
