@@ -4,6 +4,7 @@ use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::Subs
 
 use std::{net::SocketAddr, time::Duration};
 
+// todo: securing the api
 #[tokio::main]
 async fn main() {
     tracing_subscriber::registry()
