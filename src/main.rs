@@ -2,6 +2,7 @@ use newsletter::configuration::get_configuration;
 use newsletter::startup::Application;
 use newsletter::telemetry::{get_subscriber, init_subscriber};
 
+// todo: securing the api
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let subscriber = get_subscriber("newsletter".into(), "info".into(), std::io::stdout);
